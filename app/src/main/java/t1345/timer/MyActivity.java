@@ -31,7 +31,7 @@ public class MyActivity extends Activity {
 
         Log.e(TAG,"oncreate step2");
 
-        
+
     }
 
     static public String formatTime(long millis) {
