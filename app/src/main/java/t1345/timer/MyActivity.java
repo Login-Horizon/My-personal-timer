@@ -1,6 +1,7 @@
 package t1345.timer;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,18 +21,17 @@ public class MyActivity extends Activity {
     Date curTime = new Date(System.currentTimeMillis());
     int hours, minute, quant;
     List<Date> curTime_list = new ArrayList<Date>();
+    AlarmManager am ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e(TAG,"oncreate step1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        time_list = (ListView) findViewById(R.id.listView);
-        ArrayAdapter<String> arrayAdapter =
-                        new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,back_time_list(curTime,13,45,3));
+
         Log.e(TAG,"oncreate step2");
 
-        time_list.setAdapter(arrayAdapter);
+        
     }
 
     static public String formatTime(long millis) {
@@ -65,7 +65,7 @@ public class MyActivity extends Activity {
         return output;
     }
 
-    static private List<String> back_time_list(Date currTime , int sethours, int setminute, int mquant) {
+    static private List<Date> back_time_list(Date currTime , int sethours, int setminute, int mquant) {
         List<String> mTime_list = new ArrayList<String>();
         List<Date> quasi_date = new ArrayList<Date>();
         Log.e(TAG,"back_time");
@@ -88,22 +88,13 @@ public class MyActivity extends Activity {
 
 
             currTime.setMinutes(currTime.getMinutes() + 45);
-//                                                            util = (Long) currTime.clone();
-//                                                                      mTime_list.add((String) formatTime(util));
             quasi_date.add((Date)currTime.clone());
             currTime.setMinutes(currTime.getMinutes() + 5);
-//                                                            util = (Long) currTime.clone();
-//                                                                      mTime_list.add((String) formatTime(util));
             quasi_date.add((Date)currTime.clone());
             currTime.setMinutes(currTime.getMinutes() + 45);
-//                                                            util = (Long) currTime.clone();
-//                                                                       mTime_list.add((String) formatTime(util));
             quasi_date.add((Date)currTime.clone());
             if (i < mquant-1) { //add large break time
                 currTime.setMinutes(currTime.getMinutes() + 10);
-
-//                                                              util = (Long) currTime.clone();
-//                                                                          mTime_list.add((String) formatTime(util));
                 quasi_date.add((Date)currTime.clone());
 
             }
@@ -115,7 +106,8 @@ public class MyActivity extends Activity {
 
 
         }
-        return mTime_list;
+        return quasi_date;
+
 
 
     }
