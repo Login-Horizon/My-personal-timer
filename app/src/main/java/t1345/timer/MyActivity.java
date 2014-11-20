@@ -9,11 +9,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 
 public class MyActivity extends Activity {
+
 
     ListView time_list;
     static   String TAG = "my_timer";
@@ -23,6 +25,8 @@ public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         Log.e(TAG,"oncreate step1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
@@ -67,8 +71,20 @@ public class MyActivity extends Activity {
     }
 
     static private List<String> back_time_list(Date currTime , int sethours, int setminute, int mquant) {
+        Calendar calNow = Calendar.getInstance();
+        Calendar calSet = (Calendar) calNow.clone();
+        if(calSet.compareTo(calNow) <= 0){
+            //Today Set time passed, count to tomorrow
+            calSet.add(Calendar.DATE, 1);
+        }
+
+        calSet.set(Calendar.HOUR_OF_DAY, sethours);
+        calSet.set(Calendar.MINUTE, setminute);
+        calSet.set(Calendar.SECOND, 0);
+        calSet.set(Calendar.MILLISECOND, 0);
+
         List<String> mTime_list = new ArrayList<String>();
-        List<Date> quasi_date = new ArrayList<Date>();
+        List<Calendar> quasi_date = new ArrayList<Calendar>();
         Log.e(TAG,"back_time");
 
 
@@ -80,39 +96,33 @@ public class MyActivity extends Activity {
         //util = (Long) currTime.clone();
         Log.e(TAG,"set_time in back time");
       //  mTime_list.add((String) formatTime(util));
-        quasi_date.add((Date)currTime.clone());
+        quasi_date.add((Calendar) calSet.clone());
 
         Log.e(TAG,"add list back_time");
 
         for (int i = 0; i < mquant; i++) { //add alarm_time in  list
             Log.e(TAG,"loop in back_time");
 
+            calSet.add(Calendar.MINUTE, + 45 );
 
-            currTime.setMinutes(currTime.getMinutes() + 45);
-//                                                            util = (Long) currTime.clone();
-//                                                                      mTime_list.add((String) formatTime(util));
-            quasi_date.add((Date)currTime.clone());
-            currTime.setMinutes(currTime.getMinutes() + 5);
-//                                                            util = (Long) currTime.clone();
-//                                                                      mTime_list.add((String) formatTime(util));
-            quasi_date.add((Date)currTime.clone());
-            currTime.setMinutes(currTime.getMinutes() + 45);
-//                                                            util = (Long) currTime.clone();
-//                                                                       mTime_list.add((String) formatTime(util));
-            quasi_date.add((Date)currTime.clone());
+            quasi_date.add((Calendar)calSet.clone());
+            calSet.add(Calendar.MINUTE, + 5 );
+
+            quasi_date.add((Calendar)calSet.clone());
+            calSet.add(Calendar.MINUTE, + 45 );
+
+            quasi_date.add((Calendar)calSet.clone());
             if (i < mquant-1) { //add large break time
-                currTime.setMinutes(currTime.getMinutes() + 10);
+            calSet.add(Calendar.MINUTE, + 10 );
 
-//                                                              util = (Long) currTime.clone();
-//                                                                          mTime_list.add((String) formatTime(util));
-                quasi_date.add((Date)currTime.clone());
+                quasi_date.add((Calendar)calSet.clone());
 
             }
 
 
         }
         for (int i = 0; i <quasi_date.size()  ; i++) {
-            mTime_list.add(formatTime(quasi_date.get(i).getTime()));
+            mTime_list.add((quasi_date.get(i).toString()));
 
 
         }
