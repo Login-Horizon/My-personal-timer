@@ -17,7 +17,7 @@ public class MyActivity extends Activity {
 
     ListView time_list;
     static   String TAG = "my_timer";
-    Date curTime = new Date(System.currentTimeMillis());
+   static   Date curTime ;
     int hours, minute, quant;
     List<Date> curTime_list = new ArrayList<Date>();
 
@@ -27,6 +27,7 @@ public class MyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
         time_list = (ListView) findViewById(R.id.listView);
+        Date curTime  = new Date(System.nanoTime());
         ArrayAdapter<String> arrayAdapter =
                         new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,back_time_list(curTime,13,45,3));
         Log.e(TAG,"oncreate step2");
