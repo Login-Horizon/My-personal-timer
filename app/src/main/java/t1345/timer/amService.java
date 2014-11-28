@@ -100,7 +100,7 @@ public class amService extends Service {
 
     }
     void sendNotif() {
-        // 1-СЏ С‡Р°СЃС‚СЊ
+
         Notification notif = new Notification(R.drawable.ic_launcher, "Time",
                 System.currentTimeMillis());
 

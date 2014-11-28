@@ -45,38 +45,7 @@ public class MyActivity extends Activity {
 
     }
 
-    static public String formatTime(long millis) {
-        Log.e(TAG,"format_time");
-
-
-
-        String output = "";
-        long seconds = millis / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-
-        seconds = seconds % 60;
-        minutes = minutes % 60;
-        hours = hours % 60;
-
-        String secondsD = String.valueOf(seconds);
-        String minutesD = String.valueOf(minutes);
-        String hoursD = String.valueOf(hours);
-
-        if (seconds < 10)
-            secondsD = "0" + seconds;
-        if (minutes < 10)
-            minutesD = "0" + minutes;
-
-        if (hours < 10)
-            hoursD = "0" + hours;
-
-        output = hoursD + " : " + minutesD + " : " + secondsD;
-
-        return output;
-    }
-
-
+   
 
 
     @Override
