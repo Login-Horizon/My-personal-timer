@@ -2,11 +2,14 @@ package t1345.timer;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -22,14 +25,22 @@ public class MyActivity extends Activity {
     int hours, minute, quant;
     List<Date> curTime_list = new ArrayList<Date>();
     AlarmManager am ;
+    Button bt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e(TAG,"oncreate step1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+        bt = (Button) findViewById(R.id.button);
 
         Log.e(TAG,"oncreate step2");
+
+    }
+    public  void  Omclick(View v){
+        startService(new Intent(this, amService.class).putExtra("timeHour", 13));
+        startService(new Intent(this, amService.class).putExtra("timeMinute", 45));
+        startService(new Intent(this, amService.class).putExtra("quant",3));
 
 
     }
@@ -65,52 +76,7 @@ public class MyActivity extends Activity {
         return output;
     }
 
-    static private List<Date> back_time_list(Date currTime , int sethours, int setminute, int mquant) {
-        List<String> mTime_list = new ArrayList<String>();
-        List<Date> quasi_date = new ArrayList<Date>();
-        Log.e(TAG,"back_time");
 
-
-        currTime.setHours(sethours);
-        currTime.setMinutes(setminute);
-        long util;
-        Log.e(TAG,"ser_time in back time");
-
-        //util = (Long) currTime.clone();
-        Log.e(TAG,"set_time in back time");
-      //  mTime_list.add((String) formatTime(util));
-        quasi_date.add((Date)currTime.clone());
-
-        Log.e(TAG,"add list back_time");
-
-        for (int i = 0; i < mquant; i++) { //add alarm_time in  list
-            Log.e(TAG,"loop in back_time");
-
-
-            currTime.setMinutes(currTime.getMinutes() + 45);
-            quasi_date.add((Date)currTime.clone());
-            currTime.setMinutes(currTime.getMinutes() + 5);
-            quasi_date.add((Date)currTime.clone());
-            currTime.setMinutes(currTime.getMinutes() + 45);
-            quasi_date.add((Date)currTime.clone());
-            if (i < mquant-1) { //add large break time
-                currTime.setMinutes(currTime.getMinutes() + 10);
-                quasi_date.add((Date)currTime.clone());
-
-            }
-
-
-        }
-        for (int i = 0; i <quasi_date.size()  ; i++) {
-            mTime_list.add(formatTime(quasi_date.get(i).getTime()));
-
-
-        }
-        return quasi_date;
-
-
-
-    }
 
 
     @Override
