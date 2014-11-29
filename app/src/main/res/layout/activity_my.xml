@@ -11,11 +11,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_name"
-        android:id="@+id/button"
+        android:text="@string/button_start"
+        android:id="@+id/btStart"
+        android:onClick="CalculClick"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="45dp"
-        android:layout_marginTop="94dp"
-        android:onClick="Omclick"/>
+        android:layout_centerHorizontal="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_go"
+        android:id="@+id/btList"
+        android:onClick="GoToList"
+        android:layout_toStartOf="@+id/btStart"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/btStart" />
 </RelativeLayout>
