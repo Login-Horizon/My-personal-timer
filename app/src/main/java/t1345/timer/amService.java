@@ -47,10 +47,7 @@ public class amService extends Service {
      private List<Calendar> back_time_list( int sethours, int setminute, int mquant) {
         Calendar mcalNow = Calendar.getInstance();
         Calendar mcalSet = (Calendar) mcalNow.clone();
-        if(mcalSet.compareTo(mcalNow) <= 0){
-            //Today Set time passed, count to tomorrow
-            mcalSet.add(Calendar.DATE, 1);
-        }
+
 
         mcalSet.set(Calendar.HOUR_OF_DAY, sethours);
         mcalSet.set(Calendar.MINUTE, setminute);
