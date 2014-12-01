@@ -69,7 +69,7 @@ public class amService extends Service {
         quasi_date.add((Calendar) mcalSet.clone());
 
 
-        for (int i = 0; i < mquant; i++) { //add alarm_time in  list
+        for (int i = 0; i < mquant; i++) {
 
 
             mcalSet.add(Calendar.MINUTE, +45);
@@ -116,33 +116,7 @@ public class amService extends Service {
         nm.notify(1, notif);
 
     }
-
-    public void countDTimer  (final List<Calendar> timeList) {
-        long ch;
-        Calendar time = Calendar.getInstance();
-        if (timeList.size() != 0) {
-            ch =time.getTimeInMillis() -  timeList.get(0).getTimeInMillis() ;
-            new CountDownTimer(ch, 1000) {
-
-                public void onTick(long millisUntilFinished) {
-                   Log.i("time go","mytime");
-
-
-                }
-
-                public void onFinish() {
-                    sendNotif();
-
-
-
-                    timeList.remove(0);
-                   countDTimer(timeList);
-                }
-            }.start();
-
-        }
-
-    }
+    
 
 
     public IBinder onBind(Intent arg0) {
