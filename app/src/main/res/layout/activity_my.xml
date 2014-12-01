@@ -58,6 +58,7 @@
         style="@android:style/Holo.ButtonBar"
         android:id="@+id/stop_button"
         android:layout_toEndOf="@+id/button"
-        android:layout_above="@+id/Short_time" />
+        android:layout_above="@+id/Short_time"
+        android:onClick="Stopbt" />
 
 </RelativeLayout>
