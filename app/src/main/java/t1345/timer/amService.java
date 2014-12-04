@@ -20,39 +20,67 @@ public class amService extends Service {
     final String LOG_TAG = "myLogs";
     ExecutorService es;
     static String serSrting = "hello";
-    static int timeHour = 13;
+    static int timeHour = 20;
     static int timeMinute = 45;
-    static int quant = 3;
+    static int quant  = 5;
+    MyBinder binder = new MyBinder();
     NotificationManager nm;
 
     public void onCreate() {
         super.onCreate();
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Log.d(LOG_TAG, "MyService onCreate");
+        Log.e(LOG_TAG, "MyService onCreate error");
 
     }
 
     public void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "MyService onDestroy");
+        Log.e(LOG_TAG, "MyService onDestroy error");
+
 
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
+        System.out.println("Intent value: " + String.valueOf(intent));
+        if (intent == null) {
+            return -1;
+        }
+
+
         Log.d(LOG_TAG, "MyService onStartCommand");
-         timeHour = intent.getIntExtra("timeHour", 13);
-         timeMinute = intent.getIntExtra("timeMinute", 45);
-         quant = intent.getIntExtra("quant", 3);
+        // ya je govoril, chto intent==null
+       if (intent != null) {
 
-
-        return super.onStartCommand(intent, flags, startId);
+            timeHour = intent.getIntExtra("timeHour", 14);
+            timeMinute = intent.getIntExtra("timeMinute", 45);
+            quant = intent.getIntExtra("quant", 4);
+            Log.d(LOG_TAG, "Onstart getextra work");
+//
+//            while (true) {
+//        if (timeHour != 0) {
+                StimeCalcul(SbackTimeList(timeHour, timeMinute, quant));
 
     }
-    public void time_calcul(final List<Calendar> list)
-    //вычисление и подача сигнала сервису уведомленя
-    // н совсем понятно работает ли корректно
-    {
+            Log.e(LOG_TAG, "Onstart timecalcul error");
+    System.out.print("intent/getextra" + timeHour + " :" + timeMinute + ":" + quant);
+//        System.out.print("intent/getextra" + timeHour + " :" + timeMinute + ":" + quant);
 
+        //}
+
+
+        //return super.onStartCommand(intent, flags, startId); в чем проблема? он ничего из активити не береть . зато активити береть и исползует значения из сервиса вооот
+        return super.onStartCommand(intent,flags,startId);
+
+
+
+
+    }
+
+    public void StimeCalcul(final List<Calendar> list)
+    //вычисление и подача сигнала сервису уведомленя
+    {
 
 
         if (list.size() == 0)// проблемная зона , эта часть если закоменнтировать то раблтает
@@ -64,15 +92,12 @@ public class amService extends Service {
         } else {
             Calendar myDate = Calendar.getInstance();
 
-            long ch = list.get(0).getTimeInMillis() -  myDate.getTimeInMillis() ;
-
-
+            long ch = list.get(0).getTimeInMillis() - myDate.getTimeInMillis();
 
 
             new CountDownTimer(ch, 1000) {
 
                 public void onTick(long millisUntilFinished) {
-
 
 
                 }
@@ -82,13 +107,15 @@ public class amService extends Service {
                     sendNotif();
                     //класс для возврата из уведомления в основной активити (реализован: скоро покажу)
                     list.remove(0);
-                    time_calcul(list);
+                    StimeCalcul(list);
                 }
             }.start();
+            Log.d(LOG_TAG,"send notif qorck");
 
         }
     }
-    public List<Calendar> back_time_list(int sethours , int setminute, int mquant) {
+
+    public List<Calendar> SbackTimeList(int sethours, int setminute, int mquant) {
         Calendar mcalNow = Calendar.getInstance();
         Calendar mcalSet = (Calendar) mcalNow.clone();
 
@@ -110,17 +137,17 @@ public class amService extends Service {
         for (int i = 0; i < mquant; i++) { //add alarm_time in  list
 
 
-            mcalSet.add(Calendar.MINUTE, +45);
+            mcalSet.add(Calendar.MINUTE, +5);
+
+            quasi_date.add((Calendar) mcalSet.clone());
+            mcalSet.add(Calendar.MINUTE, +1);
 
             quasi_date.add((Calendar) mcalSet.clone());
             mcalSet.add(Calendar.MINUTE, +5);
 
             quasi_date.add((Calendar) mcalSet.clone());
-            mcalSet.add(Calendar.MINUTE, +45);
-
-            quasi_date.add((Calendar) mcalSet.clone());
             if (i < mquant - 1) { //add large break time
-                mcalSet.add(Calendar.MINUTE, +10);
+                mcalSet.add(Calendar.MINUTE, +2);
 
                 quasi_date.add((Calendar) mcalSet.clone());
 
@@ -139,7 +166,9 @@ public class amService extends Service {
                 break;
             }
         }
+        Log.d(LOG_TAG,"list workc");
         return quasi_date;
+
     }
 
 
@@ -160,15 +189,18 @@ public class amService extends Service {
 
 
         nm.notify(1, notif);
+        Log.d(LOG_TAG,"notif work");
 
     }
-
 
     public IBinder onBind(Intent arg0) {
-        return null;
+        Log.d(LOG_TAG, "MyService onBind");
+        return binder;
     }
 
+
     class MyBinder extends Binder {
+
         amService getService() {
             return amService.this;
         }

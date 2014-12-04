@@ -1,7 +1,6 @@
 package t1345.timer;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -15,30 +14,20 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 
 public class MyActivity extends Activity {
 
-    ListView time_list;
-    static String TAG = "my_timer";
-    Date curTime = new Date(System.currentTimeMillis());
-    int hours, minute, quant;
-    List<Date> curTime_list = new ArrayList<Date>();
-    AlarmManager am;
-
+    static String TAG = "myLogs";
     Calendar calNow = Calendar.getInstance();
     Calendar calSet = (Calendar) calNow.clone();
-
-
     static int lessonNum = 3;
     static int myHour = 13;
     static int myMinute = 45;
@@ -48,12 +37,11 @@ public class MyActivity extends Activity {
     TextView tvStartTime;
     boolean bound = false;
     ServiceConnection sConn;
-
     amService myService;
-
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG, "oncreate step1");
+        Log.d(TAG, "oncreate create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
         btStart = (Button) findViewById(R.id.button);
@@ -63,25 +51,48 @@ public class MyActivity extends Activity {
         tvTimerTime = (TextView) findViewById(R.id.Short_time);
         tvTimerTime.setVisibility(View.INVISIBLE);
         tvStartTime = (TextView) findViewById(R.id.tvTime);
+        intent = new Intent(this, amService.class);
 
         sConn = new ServiceConnection() {
-    public void onServiceConnected(ComponentName name, IBinder binder) {
-        Log.d("Qn_Tag", "MainActivity onServiceConnected");
-        myService = ((amService.MyBinder) binder).getService();
-        bound = true;
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                Log.d(TAG, "MainActivity onServiceConnected");
+                myService = ((amService.MyBinder) binder).getService();
+                bound = true;
+            }
+
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d(TAG, "MainActivity onServiceDisconnected");
+                bound = false;
+            }
+        };
     }
 
-    public void onServiceDisconnected(ComponentName name) {
-        Log.d("Qn_tog", "MainActivity onServiceDisconnected");
-        bound = false;
-    }
-};
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart start");
 
-}
+           super.onStart();
+
+        bindService(intent, sConn, 0);
+
+
+//             if (bound) {
+//            btStop.setVisibility(View.VISIBLE);
+//            AtimeCalcul(AbackTimeList(amService.timeHour, amService.timeMinute, amService.quant));//пустое активти((
+//            // то на случай если баунд(зп коннект отвечает) тру .. должно  работать проверю щас
+//        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG,"ondestroy bag");
+
+        super.onDestroy();
+    }
 
     static public String formatTime(long millis) //format Time for tv
     {
-        Log.i(TAG, "Workformat");
+
 
         String output = "";
         long seconds = millis / 1000;
@@ -138,8 +149,8 @@ public class MyActivity extends Activity {
                     } else {
                         lessonNum = 4;
                     }
-                    calSet.add(Calendar.MINUTE,(105*4)-10);
-                    if (calNow.compareTo(calSet)<0){
+                    calSet.add(Calendar.MINUTE, (105 * 4) - 10);
+                    if (calNow.compareTo(calSet) > 0) {
                         Toast.makeText(getApplicationContext(), "please write current time", Toast.LENGTH_SHORT).show();
                         showDialog(1);
                     }
@@ -159,70 +170,84 @@ public class MyActivity extends Activity {
 
     TimePickerDialog.OnTimeSetListener setTime = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-
             myHour = hourOfDay;
             myMinute = minute;
+            tvStartTime.setText("start in : " + hourOfDay + ":" + minute);
             showDialog(42);
-
-
-
         }
     };
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!bound) return;
+        unbindService(sConn);
+        bound = false;
+    }
 
 
-    public void  Startbt (View v){
+    public void Startbt(View v) {//Start button я понял
         btStop.setVisibility(View.VISIBLE);
         btStart.setVisibility(View.INVISIBLE);
         tvTimerTime.setVisibility(View.VISIBLE);
-        if (bound){
-            stopService(new Intent(this,amService.class));
+        if (bound) {
+            stopService(new Intent(this, amService.class));
+        } else {
+            Bundle extra = new Bundle();
+            // tut prover luche не понимаю как это сл=деалть
+            System.out.println(" Hout minute lesson: " + myHour + " " + myMinute + " " + lessonNum);
+
+            Log.d(TAG, "start button ");
+            startService(new Intent(this, amService.class)
+                            .putExtra("timeHour", myHour)
+                                .putExtra("timeMinute", myMinute)
+                                    .putExtra("quant", lessonNum));
+
+            Log.d(TAG, "start button after connect ");
+
+            // intent.putExtras(extra);
+
+
+            Log.d(TAG, "start button after send ");
+
+                System.out.println(bound);
+
+
+
+                    AtimeCalcul(AbackTimeList(myHour, myMinute, lessonNum));//amService.timeHour, amService.timeMinute, amService.quant));
+
         }
-        startService(new Intent(this, amService.class).putExtra("timeHour", myHour).putExtra("timeMinute", myMinute).putExtra("quant",lessonNum));
-
-
     }
 
-    public void timeCalcul(final List<Calendar> list)
-    //вычисление и подача сигнала сервису уведомленя
-    // н совсем понятно работает ли корректно
+    public void AtimeCalcul(final List<Calendar> list)
+
     {
-        Log.e(TAG, "Error time_calcul");
 
 
-        if (list.size() == 0)// проблемная зона , эта часть если закоменнтировать то раблтает
-        // если даже лист присвоит null все равно не раблотает вылетает с фатал еррором
+        if (list.size() == 0)
         {
-            Log.i(TAG, "Work");
-            Log.e(TAG, "Error time_calcul");
+
 
             Toast.makeText(getApplicationContext(), "Dobby is free", Toast.LENGTH_LONG).show();
 
         } else {
-            Log.i(TAG, "Work");
-            Log.e(TAG, "Error time_calcul");
             Calendar myDate = Calendar.getInstance();
 
-            long ch = list.get(0).getTimeInMillis() -  myDate.getTimeInMillis() ;
-
-
-            //    Toast.makeText(this, "time now" + formatTime(dates.get(0).getTime()), Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "time now" + formatTime(myDate.getTimeInMillis()), Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "time set" + formatTime(ch), Toast.LENGTH_SHORT).show();
-
+            long ch = list.get(0).getTimeInMillis() - myDate.getTimeInMillis();
             new CountDownTimer(ch, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     tvTimerTime.setText(formatTime(millisUntilFinished));
-
+                    System.out.println("intentiti: " + amService.timeHour + " " + amService.timeMinute  + " " + amService.quant);
 
                 }
 
                 public void onFinish() {
 
 
+
+
                     list.remove(0);
-                    timeCalcul(list);
+                    AtimeCalcul(list); // recursiya?да я передаю список со значениям . он из них сроит таймеры и на финише далеят элемент списка первый элемент и перезапуска..
                 }
             }.start();
 
@@ -230,8 +255,8 @@ public class MyActivity extends Activity {
     }
 
 
-
-    private List<Calendar> back_time_list( int sethours, int setminute, int mquant) {
+    private List<Calendar> AbackTimeList(int sethours, int setminute, int mquant) {//A это то что функция в активти
+        //a zachem s bolshoy bukvi funciyu nazivat? ой не знаю
         Calendar mcalNow = Calendar.getInstance();
         Calendar mcalSet = (Calendar) mcalNow.clone();
 
@@ -244,12 +269,7 @@ public class MyActivity extends Activity {
         List<Calendar> quasi_date = new ArrayList<Calendar>();
 
 
-
-
-
         long util;
-
-
 
 
         quasi_date.add((Calendar) mcalSet.clone());
@@ -260,44 +280,41 @@ public class MyActivity extends Activity {
 
             mcalSet.add(Calendar.MINUTE, +5);
 
-            quasi_date.add((Calendar)mcalSet.clone());
+            quasi_date.add((Calendar) mcalSet.clone());
             mcalSet.add(Calendar.MINUTE, +1);
 
-            quasi_date.add((Calendar)mcalSet.clone());
+            quasi_date.add((Calendar) mcalSet.clone());
             mcalSet.add(Calendar.MINUTE, +5);
 
-            quasi_date.add((Calendar)mcalSet.clone());
-            if (i < mquant-1) { //add large break time
-                mcalSet.add(Calendar.MINUTE, +1);
+            quasi_date.add((Calendar) mcalSet.clone());
+            if (i < mquant - 1) { //add large break time
+                mcalSet.add(Calendar.MINUTE, +2);
 
-                quasi_date.add((Calendar)mcalSet.clone());
+                quasi_date.add((Calendar) mcalSet.clone());
 
             }
-            Toast.makeText(this,quasi_date.get(quasi_date.size()-1).getTime().toString(),Toast.LENGTH_SHORT);
 
 
         }
-
-
-
-
 
 
         int i = 0;
-        while (i<quasi_date.size()){
-            if (mcalNow.compareTo(quasi_date.get(0))<0){
+        while (i < quasi_date.size()) {
+            if (mcalNow.compareTo(quasi_date.get(0)) < 0) {
                 quasi_date.remove(0);
                 i++;
-            }
-            else {
+            } else {
                 break;
             }
         }
-        return quasi_date;    };
+        return quasi_date;
+    }
 
-    public void Stopbt (View view){
-        if (bound){
-            stopService(new Intent(this,amService.class));
+    ;
+
+    public void Stopbt(View view) {// stop button
+        if (bound) {
+            stopService(new Intent(this, amService.class));
         }
         Intent refresh = new Intent(this, MyActivity.class);
         startActivity(refresh);
